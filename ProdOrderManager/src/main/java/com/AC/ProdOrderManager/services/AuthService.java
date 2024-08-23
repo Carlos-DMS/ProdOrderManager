@@ -26,7 +26,17 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
-    public void register(RegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException{
+    public void register(RegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
+        validateRegister(body);
+        userRepository.save(new UserModel(body.login(), passwordEncoder.encode(body.password()), UserRole.valueOf(body.role())));
+    }
+
+    public LoginResponseDTO login(LoginRequestDTO body) throws UserNotFoundException, InvalidPasswordException, InvalidDataException {
+        UserModel user = validateLogin(body);
+        return new LoginResponseDTO(user.getLogin(), tokenService.generateToken(user));
+    }
+
+    private void validateRegister(RegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
         Optional<UserModel> user = userRepository.findByLogin(body.login());
 
         List<InvalidField> invalidFields = new ArrayList<>();
@@ -34,33 +44,29 @@ public class AuthService {
                 .map(Enum::name)
                 .collect(Collectors.toSet());
 
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             if (body.login() == null || body.login().isBlank()) {
                 invalidFields.add(new InvalidField("login", "campo em branco"));
             }
             if (body.password() == null || body.password().isBlank()) {
                 invalidFields.add(new InvalidField("senha", "campo em branco"));
             }
-
             if (body.role() == null || body.role().isBlank()) {
                 invalidFields.add(new InvalidField("cargo", "campo em branco"));
-            }
-            else if (!validRoles.contains(body.role())) {
+            } else if (!validRoles.contains(body.role())) {
                 invalidFields.add(new InvalidField("cargo", "cargo inexistente"));
             }
 
             if (!invalidFields.isEmpty()) {
                 throw new InvalidDataException(invalidFields);
             }
-
-            userRepository.save(new UserModel(body.login(), passwordEncoder.encode(body.password()), UserRole.valueOf(body.role())));
         }
         else {
             throw new UserAlreadyExistsException();
         }
     }
 
-    public LoginResponseDTO login(LoginRequestDTO body) throws UserNotFoundException, InvalidPasswordException, InvalidDataException  {
+    private UserModel validateLogin(LoginRequestDTO body) throws UserNotFoundException, InvalidPasswordException, InvalidDataException {
         List<InvalidField> invalidFields = new ArrayList<>();
 
         if (body.login() == null || body.login().isBlank()) {
@@ -76,9 +82,9 @@ public class AuthService {
 
         UserModel user = userRepository.findByLogin(body.login()).orElseThrow(UserNotFoundException::new);
 
-        if (passwordEncoder.matches(body.password(), user.getPassword())) {
-            return new LoginResponseDTO(user.getLogin(), tokenService.generateToken(user));
+        if (!passwordEncoder.matches(body.password(), user.getPassword())) {
+            throw new InvalidPasswordException();
         }
-        throw new InvalidPasswordException();
+        return user;
     }
 }
