@@ -26,7 +26,7 @@ public class UserModel implements UserDetails {
     private UserRole role;
 
     public UserModel(String login, String password, UserRole role) {
-        this.login = login;
+        this.login = login.trim();
         this.password = password;
         this.role = role;
     }

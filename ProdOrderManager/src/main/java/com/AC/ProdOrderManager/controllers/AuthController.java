@@ -22,19 +22,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login (@RequestBody @Valid LoginRequestDTO body) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(authService.login(body));
-        }
-        catch (RuntimeException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(authService.login(body));
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid RegisterRequestDTO body) {
-        if (authService.register(body)){
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("ERRO: O login utilizado já está cadastrado.");
+        authService.register(body);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
