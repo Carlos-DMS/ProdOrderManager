@@ -1,6 +1,7 @@
 package com.AC.ProdOrderManager.controllers;
 
-import com.AC.ProdOrderManager.exceptions.auth.InvalidDataException;
+import com.AC.ProdOrderManager.exceptions.InvalidDataException;
+import com.AC.ProdOrderManager.exceptions.InvalidDateFormatException;
 import com.AC.ProdOrderManager.exceptions.auth.InvalidPasswordException;
 import com.AC.ProdOrderManager.exceptions.auth.UserAlreadyExistsException;
 import com.AC.ProdOrderManager.exceptions.user.UserNotFoundException;
@@ -31,5 +32,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     private ResponseEntity<String> userAlreadyExistsHandler(UserAlreadyExistsException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(InvalidDateFormatException.class)
+    private ResponseEntity<String> invalidDateFormatHandler(InvalidDateFormatException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
     }
 }

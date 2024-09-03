@@ -4,13 +4,13 @@ public enum UserRole {
     USER("user"),
     ADMIN("admin");
 
-    private String role;
+    private final String roleReport;
 
     UserRole(String role) {
-        this.role = role;
+        this.roleReport = role;
     }
 
-    public String getRole() {
-        return role;
+    public String getRoleReport() {
+        return roleReport;
     }
 }

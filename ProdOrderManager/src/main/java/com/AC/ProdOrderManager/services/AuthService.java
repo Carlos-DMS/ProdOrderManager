@@ -2,9 +2,9 @@ package com.AC.ProdOrderManager.services;
 
 import com.AC.ProdOrderManager.dtos.auth.LoginRequestDTO;
 import com.AC.ProdOrderManager.dtos.auth.LoginResponseDTO;
-import com.AC.ProdOrderManager.dtos.auth.RegisterRequestDTO;
-import com.AC.ProdOrderManager.exceptions.auth.InvalidDataException;
-import com.AC.ProdOrderManager.exceptions.auth.InvalidField;
+import com.AC.ProdOrderManager.dtos.auth.UserRegisterRequestDTO;
+import com.AC.ProdOrderManager.exceptions.InvalidDataException;
+import com.AC.ProdOrderManager.exceptions.InvalidField;
 import com.AC.ProdOrderManager.exceptions.auth.InvalidPasswordException;
 import com.AC.ProdOrderManager.exceptions.auth.UserAlreadyExistsException;
 import com.AC.ProdOrderManager.exceptions.user.UserNotFoundException;
@@ -12,7 +12,7 @@ import com.AC.ProdOrderManager.models.user.UserModel;
 import com.AC.ProdOrderManager.models.user.UserRole;
 import com.AC.ProdOrderManager.repositories.UserRepository;
 import com.AC.ProdOrderManager.security.TokenService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +20,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private TokenService tokenService;
 
-    public void register(RegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
+    public void register(UserRegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
         validateRegister(body);
         userRepository.save(new UserModel(body.login(), passwordEncoder.encode(body.password()), UserRole.valueOf(body.role())));
     }
@@ -36,7 +38,7 @@ public class AuthService {
         return new LoginResponseDTO(user.getLogin(), tokenService.generateToken(user));
     }
 
-    private void validateRegister(RegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
+    private void validateRegister(UserRegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
         Optional<UserModel> user = userRepository.findByLogin(body.login());
 
         List<InvalidField> invalidFields = new ArrayList<>();

@@ -1,4 +1,4 @@
-package com.AC.ProdOrderManager.exceptions.auth;
+package com.AC.ProdOrderManager.exceptions;
 
 import lombok.AllArgsConstructor;
 

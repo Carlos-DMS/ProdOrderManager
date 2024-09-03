@@ -2,7 +2,7 @@ package com.AC.ProdOrderManager.controllers;
 
 import com.AC.ProdOrderManager.dtos.auth.LoginRequestDTO;
 import com.AC.ProdOrderManager.dtos.auth.LoginResponseDTO;
-import com.AC.ProdOrderManager.dtos.auth.RegisterRequestDTO;
+import com.AC.ProdOrderManager.dtos.auth.UserRegisterRequestDTO;
 import com.AC.ProdOrderManager.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
     @Autowired
     AuthService authService;
+
+    @PostMapping
+    public ResponseEntity<String> register(@RequestBody @Valid UserRegisterRequestDTO body) {
+        authService.register(body);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login (@RequestBody @Valid LoginRequestDTO body) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.login(body));
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid RegisterRequestDTO body) {
-        authService.register(body);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
