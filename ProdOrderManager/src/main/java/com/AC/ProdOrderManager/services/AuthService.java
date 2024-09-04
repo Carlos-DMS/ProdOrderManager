@@ -35,7 +35,7 @@ public class AuthService {
 
     public LoginResponseDTO login(LoginRequestDTO body) throws UserNotFoundException, InvalidPasswordException, InvalidDataException {
         UserModel user = validateLogin(body);
-        return new LoginResponseDTO(user.getLogin(), tokenService.generateToken(user));
+        return new LoginResponseDTO(user.getLogin(), tokenService.generateToken(user), user.getRole().getRoleReport());
     }
 
     private void validateRegister(UserRegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {

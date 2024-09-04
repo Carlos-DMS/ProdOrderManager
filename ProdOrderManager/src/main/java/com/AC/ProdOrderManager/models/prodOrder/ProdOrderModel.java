@@ -1,13 +1,10 @@
 package com.AC.ProdOrderManager.models.prodOrder;
 
-import com.AC.ProdOrderManager.repositories.ProdOrderRepository;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Year;
 import java.time.format.DateTimeFormatter;
 
 @Entity
@@ -17,8 +14,6 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @EqualsAndHashCode(of = "id")
 public class ProdOrderModel {
-    @Autowired
-    ProdOrderRepository prodOrderRepository;
 
     @Id
     private String id;
@@ -31,31 +26,25 @@ public class ProdOrderModel {
     private ProdOrderStatus status = ProdOrderStatus.SEPARANDO_MATERIAIS;
 
     @Transient
-    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    @PrePersist
-    private void onCreate() {
-        this.id = generateNextId();
-    }
-
-    public ProdOrderModel(String customer, String product, Integer quantity, String deliveryDate) {
+    public ProdOrderModel(String id, String customer, String product, Integer quantity, String deliveryDate) {
+        this.id = id;
         this.customer = customer;
         this.product = product;
         this.quantity = quantity;
         this.deliveryDate = LocalDate.parse(deliveryDate, dateFormatter);
     }
 
-    private String generateNextId() {
-        String currentYear = String.valueOf(Year.now().getValue()).substring(2);
-        String lastId = prodOrderRepository.findLastIdForYear(currentYear);
-        int lastSequenceNumber = 0;
+    public String getOpeningDateToString() {
+        return openingDate.format(dateFormatter);
+    }
 
-        if (lastId != null) {
-            lastSequenceNumber = Integer.parseInt(lastId.substring(0, 4));
-        }
+    public String getLastReviewDateToString() {
+        return lastReviewDate != null ? lastReviewDate.format(dateFormatter) : "";
+    }
 
-        int nextSequenceNumber = lastSequenceNumber + 1;
-
-        return String.format("%04d", nextSequenceNumber) + "-" + currentYear;
+    public String getDeliveryDateToString() {
+        return deliveryDate.format(dateFormatter);
     }
 }

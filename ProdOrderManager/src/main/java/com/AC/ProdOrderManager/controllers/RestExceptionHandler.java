@@ -1,15 +1,17 @@
 package com.AC.ProdOrderManager.controllers;
 
 import com.AC.ProdOrderManager.exceptions.InvalidDataException;
-import com.AC.ProdOrderManager.exceptions.InvalidDateFormatException;
 import com.AC.ProdOrderManager.exceptions.auth.InvalidPasswordException;
 import com.AC.ProdOrderManager.exceptions.auth.UserAlreadyExistsException;
+import com.AC.ProdOrderManager.exceptions.prodOrder.NoMatchingOrdersException;
 import com.AC.ProdOrderManager.exceptions.user.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -34,8 +36,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
 
-    @ExceptionHandler(InvalidDateFormatException.class)
-    private ResponseEntity<String> invalidDateFormatHandler(InvalidDateFormatException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+    @ExceptionHandler(DateTimeParseException.class)
+    private ResponseEntity<String> invalidDateFormatHandler(DateTimeParseException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de data inválido");
+    }
+
+    @ExceptionHandler(NoMatchingOrdersException.class)
+    private ResponseEntity<String> noMatchingOrdersHandler(NoMatchingOrdersException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    private ResponseEntity<String> genericException(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro inesperado: " + exception.getMessage());
     }
 }
