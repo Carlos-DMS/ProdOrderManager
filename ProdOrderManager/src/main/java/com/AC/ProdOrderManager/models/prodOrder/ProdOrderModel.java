@@ -1,5 +1,6 @@
 package com.AC.ProdOrderManager.models.prodOrder;
 
+import com.AC.ProdOrderManager.models.product.ProductModel;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +19,7 @@ public class ProdOrderModel {
     @Id
     private String id;
     private String customer;
-    private String product;
+    private ProductModel product;
     private Integer quantity;
     private final LocalDateTime openingDate = LocalDateTime.now();
     private LocalDate lastReviewDate;
@@ -28,7 +29,7 @@ public class ProdOrderModel {
     @Transient
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public ProdOrderModel(String id, String customer, String product, Integer quantity, String deliveryDate) {
+    public ProdOrderModel(String id, String customer, ProductModel product, Integer quantity, String deliveryDate) {
         this.id = id;
         this.customer = customer;
         this.product = product;

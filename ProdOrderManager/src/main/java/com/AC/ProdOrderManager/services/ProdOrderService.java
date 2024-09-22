@@ -51,7 +51,7 @@ public class ProdOrderService {
             invalidFields.add(new InvalidField("cliente", "campo em branco"));
         }
 
-        if (body.product() == null || body.product().isBlank()) {
+        if (body.product() == null) {
             invalidFields.add(new InvalidField("produto", "campo em branco"));
         }
 

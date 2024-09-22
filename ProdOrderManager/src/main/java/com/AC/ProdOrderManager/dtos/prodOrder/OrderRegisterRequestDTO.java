@@ -1,4 +1,6 @@
 package com.AC.ProdOrderManager.dtos.prodOrder;
 
-public record OrderRegisterRequestDTO(String customer, String product, Integer quantity, String deliveryDate) {
+import com.AC.ProdOrderManager.models.product.ProductModel;
+
+public record OrderRegisterRequestDTO(String customer, ProductModel product, Integer quantity, String deliveryDate) {
 }
