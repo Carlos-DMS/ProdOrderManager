@@ -2,7 +2,7 @@ package com.AC.ProdOrderManager.services;
 
 import com.AC.ProdOrderManager.dtos.auth.LoginRequestDTO;
 import com.AC.ProdOrderManager.dtos.auth.LoginResponseDTO;
-import com.AC.ProdOrderManager.dtos.auth.UserRegisterRequestDTO;
+import com.AC.ProdOrderManager.dtos.auth.RegisterUserRequestDTO;
 import com.AC.ProdOrderManager.exceptions.InvalidDataException;
 import com.AC.ProdOrderManager.exceptions.InvalidField;
 import com.AC.ProdOrderManager.exceptions.auth.InvalidPasswordException;
@@ -28,7 +28,7 @@ public class AuthService {
     @Autowired
     private TokenService tokenService;
 
-    public void register(UserRegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
+    public void register(RegisterUserRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
         validateRegister(body);
         userRepository.save(new UserModel(body.login(), passwordEncoder.encode(body.password()), UserRole.valueOf(body.role())));
     }
@@ -38,7 +38,7 @@ public class AuthService {
         return new LoginResponseDTO(user.getLogin(), tokenService.generateToken(user), user.getRole().getRoleReport());
     }
 
-    private void validateRegister(UserRegisterRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
+    private void validateRegister(RegisterUserRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
         Optional<UserModel> user = userRepository.findByLogin(body.login());
 
         List<InvalidField> invalidFields = new ArrayList<>();

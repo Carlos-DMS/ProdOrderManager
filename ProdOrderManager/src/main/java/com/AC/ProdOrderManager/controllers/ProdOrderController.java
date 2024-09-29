@@ -1,7 +1,7 @@
 package com.AC.ProdOrderManager.controllers;
 
 import com.AC.ProdOrderManager.dtos.prodOrder.GetOrdersResponseDTO;
-import com.AC.ProdOrderManager.dtos.prodOrder.OrderRegisterRequestDTO;
+import com.AC.ProdOrderManager.dtos.prodOrder.RegisterOrderRequestDTO;
 import com.AC.ProdOrderManager.services.ProdOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +14,10 @@ import java.util.List;
 @RequestMapping("/prodOrder")
 public class ProdOrderController {
     @Autowired
-    ProdOrderService prodOrderService;
+    private ProdOrderService prodOrderService;
 
     @PostMapping
-    public ResponseEntity register(@RequestBody OrderRegisterRequestDTO body) {
+    public ResponseEntity register(@RequestBody RegisterOrderRequestDTO body) {
         prodOrderService.register(body);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -2,7 +2,7 @@ package com.AC.ProdOrderManager.controllers;
 
 import com.AC.ProdOrderManager.dtos.auth.LoginRequestDTO;
 import com.AC.ProdOrderManager.dtos.auth.LoginResponseDTO;
-import com.AC.ProdOrderManager.dtos.auth.UserRegisterRequestDTO;
+import com.AC.ProdOrderManager.dtos.auth.RegisterUserRequestDTO;
 import com.AC.ProdOrderManager.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ public class AuthController {
     AuthService authService;
 
     @PostMapping
-    public ResponseEntity<String> register(@RequestBody UserRegisterRequestDTO body) {
+    public ResponseEntity<String> register(@RequestBody RegisterUserRequestDTO body) {
         authService.register(body);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

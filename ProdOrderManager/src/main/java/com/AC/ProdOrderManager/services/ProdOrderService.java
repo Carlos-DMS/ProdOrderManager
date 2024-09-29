@@ -1,12 +1,13 @@
 package com.AC.ProdOrderManager.services;
 
 import com.AC.ProdOrderManager.dtos.prodOrder.GetOrdersResponseDTO;
-import com.AC.ProdOrderManager.dtos.prodOrder.OrderRegisterRequestDTO;
+import com.AC.ProdOrderManager.dtos.prodOrder.RegisterOrderRequestDTO;
 import com.AC.ProdOrderManager.exceptions.InvalidDataException;
 import com.AC.ProdOrderManager.exceptions.InvalidField;
 import com.AC.ProdOrderManager.exceptions.prodOrder.NoMatchingOrdersException;
 import com.AC.ProdOrderManager.models.prodOrder.ProdOrderModel;
 import com.AC.ProdOrderManager.models.prodOrder.ProdOrderStatus;
+import com.AC.ProdOrderManager.models.product.ProductModel;
 import com.AC.ProdOrderManager.repositories.ProdOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,10 @@ import java.util.Optional;
 public class ProdOrderService {
     @Autowired
     ProdOrderRepository prodOrderRepository;
+    @Autowired
+    ProductService productService;
 
-    public void register(OrderRegisterRequestDTO body) throws InvalidDataException, DateTimeParseException {
+    public void register(RegisterOrderRequestDTO body) throws InvalidDataException, DateTimeParseException {
         prodOrderRepository.save(validateRegister(body));
     }
 
@@ -44,15 +47,26 @@ public class ProdOrderService {
         return convertOrdersToDTOs(orders);
     }
 
-    private ProdOrderModel validateRegister(OrderRegisterRequestDTO body) throws InvalidDataException, DateTimeParseException {
+    private ProdOrderModel validateRegister(RegisterOrderRequestDTO body) throws InvalidDataException, DateTimeParseException {
         List<InvalidField> invalidFields = new ArrayList<>();
 
         if (body.customer() == null || body.customer().isBlank()) {
             invalidFields.add(new InvalidField("cliente", "campo em branco"));
         }
 
-        if (body.product() == null) {
+        if (body.productIdentifier() == null) {
             invalidFields.add(new InvalidField("produto", "campo em branco"));
+        }
+
+        Optional<ProductModel> optProduct = productService.findProductByIdentifier(body.productIdentifier());
+        ProductModel product;
+
+        if (optProduct.isPresent()) {
+            product = optProduct.get();
+        }
+        else {
+            //substituir por exceção personalizada
+            throw new RuntimeException();
         }
 
         if (body.quantity() == null) {
@@ -69,7 +83,7 @@ public class ProdOrderService {
         if (!invalidFields.isEmpty()) {
             throw new InvalidDataException(invalidFields);
         }
-        return new ProdOrderModel(generateNextId(), body.customer(), body.product(), body.quantity(), body.deliveryDate());
+        return new ProdOrderModel(generateNextId(), body.customer(), product, body.quantity(), body.deliveryDate());
     }
 
     private List<GetOrdersResponseDTO> convertOrdersToDTOs (List<ProdOrderModel> orders) {
