@@ -23,6 +23,8 @@ public class ProdOrderModel implements Serializable {
     @Id
     private String id;
     private String customer;
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
     private ProductModel product;
     private Integer quantity;
     private final LocalDateTime openingDate = LocalDateTime.now();
