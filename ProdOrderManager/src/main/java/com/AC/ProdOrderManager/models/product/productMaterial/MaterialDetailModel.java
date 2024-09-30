@@ -30,13 +30,14 @@ public class MaterialDetailModel implements Serializable {
     @ManyToOne
     @JoinColumn(name = "base_material_name", referencedColumnName = "name")
     private BaseMaterialModel baseMaterial;
-    private Integer quantity;
+    @Column(precision = 10, scale = 5)
+    private BigDecimal quantity;
     @Column(precision = 10, scale = 2)
     private BigDecimal totalAmount;
     @Column(precision = 10, scale = 2)
     private BigDecimal paidAmount;
 
-    public MaterialDetailModel(ProductModel product, BaseMaterialModel baseMaterial, Integer quantity, BigDecimal totalAmount, BigDecimal paidAmount) {
+    public MaterialDetailModel(ProductModel product, BaseMaterialModel baseMaterial, BigDecimal quantity, BigDecimal totalAmount, BigDecimal paidAmount) {
         this.product = product;
         this.baseMaterial = baseMaterial;
         this.quantity = quantity;
