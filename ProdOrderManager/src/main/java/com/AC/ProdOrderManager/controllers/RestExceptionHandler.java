@@ -1,8 +1,11 @@
 package com.AC.ProdOrderManager.controllers;
 
 import com.AC.ProdOrderManager.exceptions.InvalidDataException;
-import com.AC.ProdOrderManager.exceptions.auth.InvalidPasswordException;
-import com.AC.ProdOrderManager.exceptions.auth.UserAlreadyExistsException;
+import com.AC.ProdOrderManager.exceptions.material.BaseMaterialNotFoundException;
+import com.AC.ProdOrderManager.exceptions.product.ProductNotFoundException;
+import com.AC.ProdOrderManager.exceptions.user.InvalidPasswordException;
+import com.AC.ProdOrderManager.exceptions.user.UserAlreadyExistsException;
+import com.AC.ProdOrderManager.exceptions.material.BaseMaterialAlreadyExistsException;
 import com.AC.ProdOrderManager.exceptions.prodOrder.NoMatchingOrdersException;
 import com.AC.ProdOrderManager.exceptions.user.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -16,14 +19,11 @@ import java.time.format.DateTimeParseException;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    //USER EXCEPTIONS
+
     @ExceptionHandler(UserNotFoundException.class)
     private ResponseEntity<String> userNotFoundHandler(UserNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-    }
-
-    @ExceptionHandler(InvalidDataException.class)
-    private ResponseEntity<String> invalidDataHandler(InvalidDataException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
     }
 
     @ExceptionHandler(InvalidPasswordException.class)
@@ -36,14 +36,42 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
 
-    @ExceptionHandler(DateTimeParseException.class)
-    private ResponseEntity<String> invalidDateFormatHandler(DateTimeParseException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de data inválido");
-    }
+    //PROD. ORDER EXCEPTIONS
 
     @ExceptionHandler(NoMatchingOrdersException.class)
     private ResponseEntity<String> noMatchingOrdersHandler(NoMatchingOrdersException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    //PRODUCT EXCEPTIONS
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    private ResponseEntity<String> productNotFoundHandler(ProductNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    //MATERIAL EXCEPTIONS
+
+    @ExceptionHandler(BaseMaterialAlreadyExistsException.class)
+    private ResponseEntity<String> baseMaterialAlreadyExistsHandler(BaseMaterialAlreadyExistsException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(BaseMaterialNotFoundException.class)
+    private ResponseEntity<String> baseMaterialNotFoundHandler(BaseMaterialNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    //OTHER EXCEPTIONS
+
+    @ExceptionHandler(InvalidDataException.class)
+    private ResponseEntity<String> invalidDataHandler(InvalidDataException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    private ResponseEntity<String> invalidDateFormatHandler(DateTimeParseException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de data inválido");
     }
 
     @ExceptionHandler(Exception.class)

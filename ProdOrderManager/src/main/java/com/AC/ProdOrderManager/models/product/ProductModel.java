@@ -33,4 +33,3 @@ public class ProductModel implements Serializable {
         this.productType = productType;
     }
 }
-

@@ -17,7 +17,7 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping
-    public ResponseEntity register (@RequestBody RegisterProductRequestDTO body) throws Exception{
+    public ResponseEntity register (@RequestBody RegisterProductRequestDTO body){
         productService.registerProduct(body);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

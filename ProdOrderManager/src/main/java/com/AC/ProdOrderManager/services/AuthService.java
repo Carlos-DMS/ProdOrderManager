@@ -5,8 +5,8 @@ import com.AC.ProdOrderManager.dtos.auth.LoginResponseDTO;
 import com.AC.ProdOrderManager.dtos.auth.RegisterUserRequestDTO;
 import com.AC.ProdOrderManager.exceptions.InvalidDataException;
 import com.AC.ProdOrderManager.exceptions.InvalidField;
-import com.AC.ProdOrderManager.exceptions.auth.InvalidPasswordException;
-import com.AC.ProdOrderManager.exceptions.auth.UserAlreadyExistsException;
+import com.AC.ProdOrderManager.exceptions.user.InvalidPasswordException;
+import com.AC.ProdOrderManager.exceptions.user.UserAlreadyExistsException;
 import com.AC.ProdOrderManager.exceptions.user.UserNotFoundException;
 import com.AC.ProdOrderManager.models.user.UserModel;
 import com.AC.ProdOrderManager.models.user.UserRole;
@@ -39,31 +39,32 @@ public class AuthService {
     }
 
     private void validateRegister(RegisterUserRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
-        Optional<UserModel> user = userRepository.findByLogin(body.login());
 
         List<InvalidField> invalidFields = new ArrayList<>();
         Set<String> validRoles = Arrays.stream(UserRole.values())
                 .map(Enum::name)
                 .collect(Collectors.toSet());
 
-        if (user.isEmpty()) {
-            if (body.login() == null || body.login().isBlank()) {
-                invalidFields.add(new InvalidField("login", "campo em branco"));
-            }
-            if (body.password() == null || body.password().isBlank()) {
-                invalidFields.add(new InvalidField("senha", "campo em branco"));
-            }
-            if (body.role() == null || body.role().isBlank()) {
-                invalidFields.add(new InvalidField("cargo", "campo em branco"));
-            } else if (!validRoles.contains(body.role())) {
-                invalidFields.add(new InvalidField("cargo", "cargo inexistente"));
-            }
-
-            if (!invalidFields.isEmpty()) {
-                throw new InvalidDataException(invalidFields);
-            }
+        if (body.login() == null || body.login().isBlank()) {
+            invalidFields.add(new InvalidField("login", "campo em branco"));
         }
-        else {
+        if (body.password() == null || body.password().isBlank()) {
+            invalidFields.add(new InvalidField("senha", "campo em branco"));
+        }
+        if (body.role() == null || body.role().isBlank()) {
+            invalidFields.add(new InvalidField("cargo", "campo em branco"));
+        }
+        else if (!validRoles.contains(body.role())) {
+            invalidFields.add(new InvalidField("cargo", "cargo inexistente"));
+        }
+
+        if (!invalidFields.isEmpty()) {
+            throw new InvalidDataException(invalidFields);
+        }
+
+        Optional<UserModel> user = userRepository.findByLogin(body.login());
+
+        if (user.isPresent()) {
             throw new UserAlreadyExistsException();
         }
     }

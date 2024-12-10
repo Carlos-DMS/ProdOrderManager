@@ -5,6 +5,7 @@ import com.AC.ProdOrderManager.dtos.prodOrder.RegisterOrderRequestDTO;
 import com.AC.ProdOrderManager.exceptions.InvalidDataException;
 import com.AC.ProdOrderManager.exceptions.InvalidField;
 import com.AC.ProdOrderManager.exceptions.prodOrder.NoMatchingOrdersException;
+import com.AC.ProdOrderManager.exceptions.product.ProductNotFoundException;
 import com.AC.ProdOrderManager.models.prodOrder.ProdOrderModel;
 import com.AC.ProdOrderManager.models.prodOrder.ProdOrderStatus;
 import com.AC.ProdOrderManager.models.product.ProductModel;
@@ -65,8 +66,7 @@ public class ProdOrderService {
             product = optProduct.get();
         }
         else {
-            //substituir por exceção personalizada
-            throw new RuntimeException();
+            throw new ProductNotFoundException();
         }
 
         if (body.quantity() == null) {

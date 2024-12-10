@@ -1,4 +1,4 @@
 package com.AC.ProdOrderManager.dtos.material;
 
-public record RegisterBaseMaterialRequestDTO(String name, String productType) {
+public record RegisterBaseMaterialRequestDTO(String name, String unitType) {
 }

@@ -1,14 +1,17 @@
 package com.AC.ProdOrderManager.services;
 
 import com.AC.ProdOrderManager.dtos.product.RegisterProductRequestDTO;
+import com.AC.ProdOrderManager.exceptions.InvalidDataException;
+import com.AC.ProdOrderManager.exceptions.InvalidField;
+import com.AC.ProdOrderManager.exceptions.material.BaseMaterialNotFoundException;
 import com.AC.ProdOrderManager.models.product.ProductModel;
 import com.AC.ProdOrderManager.models.product.ProductType;
 import com.AC.ProdOrderManager.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -17,10 +20,10 @@ public class ProductService {
     @Autowired
     private MaterialService materialService;
 
-    public void registerProduct(RegisterProductRequestDTO body) throws Exception{
-        ProductModel product;
+    public void registerProduct(RegisterProductRequestDTO body) throws BaseMaterialNotFoundException {
+        validateRegister(body);
 
-        //adicionar posteriormente um validate
+        ProductModel product;
 
         if (body.id() != null) {
             product = new ProductModel(
@@ -36,12 +39,35 @@ public class ProductService {
                     ProductType.valueOf(body.productType())
             );
         }
+
         if (!body.productMaterials().isEmpty()) {
             product.getProductMaterials().addAll(
                     materialService.convertMaterialDTOsToEntities(body.productMaterials(), product)
             );
         }
         productRepository.save(product);
+    }
+
+    public void validateRegister(RegisterProductRequestDTO body) {
+        List<InvalidField> invalidFields = new ArrayList<>();
+
+        Set<String> validProductTypes = Arrays.stream(ProductType.values())
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+
+        if (body.name() == null || body.name().isBlank()) {
+            invalidFields.add(new InvalidField("nome do material", "campo em branco"));
+        }
+        if (body.productType() == null || body.productType().isBlank()) {
+            invalidFields.add(new InvalidField("tipo de produto", "campo em branco"));
+        }
+        else if (!validProductTypes.contains(body.productType())) {
+            invalidFields.add(new InvalidField("tipo de produto", "tipo inexistente"));
+        }
+
+        if (!invalidFields.isEmpty()) {
+            throw new InvalidDataException(invalidFields);
+        }
     }
 
     public Optional<ProductModel> findProductByIdentifier(String identifier) {
