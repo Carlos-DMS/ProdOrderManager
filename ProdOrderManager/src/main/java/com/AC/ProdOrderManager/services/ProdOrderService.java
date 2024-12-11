@@ -12,6 +12,7 @@ import com.AC.ProdOrderManager.models.product.ProductModel;
 import com.AC.ProdOrderManager.repositories.ProdOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Year;
 import java.time.format.DateTimeParseException;
@@ -26,6 +27,7 @@ public class ProdOrderService {
     @Autowired
     ProductService productService;
 
+    @Transactional
     public void register(RegisterOrderRequestDTO body) throws InvalidDataException, DateTimeParseException {
         prodOrderRepository.save(validateRegister(body));
     }

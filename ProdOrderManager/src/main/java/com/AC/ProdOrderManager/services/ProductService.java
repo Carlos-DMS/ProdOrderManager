@@ -9,6 +9,7 @@ import com.AC.ProdOrderManager.models.product.ProductType;
 import com.AC.ProdOrderManager.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,31 +21,12 @@ public class ProductService {
     @Autowired
     private MaterialService materialService;
 
+    @Transactional
     public void registerProduct(RegisterProductRequestDTO body) throws BaseMaterialNotFoundException {
         validateRegister(body);
 
-        ProductModel product;
+        ProductModel product = convertDTOToEntity(body);
 
-        if (body.id() != null) {
-            product = new ProductModel(
-                    body.id(),
-                    body.name(),
-                    ProductType.valueOf(body.productType())
-            );
-        }
-        else {
-            product = new ProductModel(
-                    generateNextId(ProductType.valueOf(body.productType())),
-                    body.name(),
-                    ProductType.valueOf(body.productType())
-            );
-        }
-
-        if (!body.productMaterials().isEmpty()) {
-            product.getProductMaterials().addAll(
-                    materialService.convertMaterialDTOsToEntities(body.productMaterials(), product)
-            );
-        }
         productRepository.save(product);
     }
 
@@ -68,6 +50,32 @@ public class ProductService {
         if (!invalidFields.isEmpty()) {
             throw new InvalidDataException(invalidFields);
         }
+    }
+
+    public ProductModel convertDTOToEntity(RegisterProductRequestDTO body) {
+        ProductModel product;
+
+        if (body.id() != null) {
+            product = new ProductModel(
+                    body.id(),
+                    body.name(),
+                    ProductType.valueOf(body.productType())
+            );
+        }
+        else {
+            product = new ProductModel(
+                    generateNextId(ProductType.valueOf(body.productType())),
+                    body.name(),
+                    ProductType.valueOf(body.productType())
+            );
+        }
+
+        if (!body.productMaterials().isEmpty()) {
+            product.getProductMaterials().addAll(
+                    materialService.convertMaterialDTOsToEntities(body.productMaterials(), product)
+            );
+        }
+        return product;
     }
 
     public Optional<ProductModel> findProductByIdentifier(String identifier) {

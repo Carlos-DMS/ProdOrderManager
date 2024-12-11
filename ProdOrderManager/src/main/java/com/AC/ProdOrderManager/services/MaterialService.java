@@ -14,6 +14,7 @@ import com.AC.ProdOrderManager.repositories.BaseMaterialRepository;
 import com.AC.ProdOrderManager.repositories.MaterialDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class MaterialService {
     @Autowired
     private MaterialDetailRepository materialDetailRepository;
 
+    @Transactional
     public void registerBaseMaterial(RegisterBaseMaterialRequestDTO body) throws InvalidDataException, BaseMaterialAlreadyExistsException{
         validateBaseMaterialRegister(body);
 

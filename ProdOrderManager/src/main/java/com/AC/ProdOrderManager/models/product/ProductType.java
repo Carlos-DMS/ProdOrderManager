@@ -8,7 +8,6 @@ public enum ProductType {
     INDUTOR("Indutor", 10),
     FONTE("Fonte", 30);
 
-
     private final String productTypeReport;
     private final Integer idPrefix;
 

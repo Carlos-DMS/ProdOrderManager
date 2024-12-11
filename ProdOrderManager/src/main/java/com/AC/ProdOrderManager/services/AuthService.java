@@ -5,9 +5,8 @@ import com.AC.ProdOrderManager.dtos.auth.LoginResponseDTO;
 import com.AC.ProdOrderManager.dtos.auth.RegisterUserRequestDTO;
 import com.AC.ProdOrderManager.exceptions.InvalidDataException;
 import com.AC.ProdOrderManager.exceptions.InvalidField;
-import com.AC.ProdOrderManager.exceptions.user.InvalidPasswordException;
 import com.AC.ProdOrderManager.exceptions.user.UserAlreadyExistsException;
-import com.AC.ProdOrderManager.exceptions.user.UserNotFoundException;
+import com.AC.ProdOrderManager.exceptions.user.InvalidLoginCredentialsException;
 import com.AC.ProdOrderManager.models.user.UserModel;
 import com.AC.ProdOrderManager.models.user.UserRole;
 import com.AC.ProdOrderManager.repositories.UserRepository;
@@ -15,6 +14,7 @@ import com.AC.ProdOrderManager.security.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,18 +28,18 @@ public class AuthService {
     @Autowired
     private TokenService tokenService;
 
+    @Transactional
     public void register(RegisterUserRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
         validateRegister(body);
         userRepository.save(new UserModel(body.login(), passwordEncoder.encode(body.password()), UserRole.valueOf(body.role())));
     }
 
-    public LoginResponseDTO login(LoginRequestDTO body) throws UserNotFoundException, InvalidPasswordException, InvalidDataException {
+    public LoginResponseDTO login(LoginRequestDTO body) throws InvalidLoginCredentialsException, InvalidDataException {
         UserModel user = validateLogin(body);
         return new LoginResponseDTO(user.getLogin(), tokenService.generateToken(user), user.getRole().getRoleReport());
     }
 
     private void validateRegister(RegisterUserRequestDTO body) throws InvalidDataException, UserAlreadyExistsException {
-
         List<InvalidField> invalidFields = new ArrayList<>();
         Set<String> validRoles = Arrays.stream(UserRole.values())
                 .map(Enum::name)
@@ -69,7 +69,7 @@ public class AuthService {
         }
     }
 
-    private UserModel validateLogin(LoginRequestDTO body) throws UserNotFoundException, InvalidPasswordException, InvalidDataException {
+    private UserModel validateLogin(LoginRequestDTO body) throws InvalidLoginCredentialsException, InvalidDataException {
         List<InvalidField> invalidFields = new ArrayList<>();
 
         if (body.login() == null || body.login().isBlank()) {
@@ -83,10 +83,10 @@ public class AuthService {
             throw new InvalidDataException(invalidFields);
         }
 
-        UserModel user = userRepository.findByLogin(body.login()).orElseThrow(UserNotFoundException::new);
+        UserModel user = userRepository.findByLogin(body.login()).orElseThrow(InvalidLoginCredentialsException::new);
 
         if (!passwordEncoder.matches(body.password(), user.getPassword())) {
-            throw new InvalidPasswordException();
+            throw new InvalidLoginCredentialsException();
         }
         return user;
     }
